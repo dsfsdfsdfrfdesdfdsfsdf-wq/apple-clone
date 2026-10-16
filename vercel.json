@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "iphone.html", "use": "@vercel/static" },
+    { "src": "mac.html", "use": "@vercel/static" },
+    { "src": "ipad.html", "use": "@vercel/static" },
+    { "src": "watch.html", "use": "@vercel/static" },
+    { "src": "vision.html", "use": "@vercel/static" },
+    { "src": "airpods.html", "use": "@vercel/static" },
+    { "src": "casa.html", "use": "@vercel/static" },
+    { "src": "entretenimento.html", "use": "@vercel/static" },
+    { "src": "acessorios.html", "use": "@vercel/static" },
+    { "src": "suporte.html", "use": "@vercel/static" },
+    { "src": "css/main.css", "use": "@vercel/static" },
+    { "src": "js/app.js", "use": "@vercel/static" },
+    { "src": "img/*", "use": "@vercel/static" },
+    { "src": "apple-image-mapping.json", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/index.html", "dest": "/index.html" },
+    { "src": "/iphone.html", "dest": "/iphone.html" },
+    { "src": "/mac.html", "dest": "/mac.html" },
+    { "src": "/ipad.html", "dest": "/ipad.html" },
+    { "src": "/watch.html", "dest": "/watch.html" },
+    { "src": "/vision.html", "dest": "/vision.html" },
+    { "src": "/airpods.html", "dest": "/airpods.html" },
+    { "src": "/casa.html", "dest": "/casa.html" },
+    { "src": "/entretenimento.html", "dest": "/entretenimento.html" },
+    { "src": "/acessorios.html", "dest": "/acessorios.html" },
+    { "src": "/suporte.html", "dest": "/suporte.html" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/img/(.*)", "dest": "/img/$1" },
+    { "src": "/apple-image-mapping.json", "dest": "/apple-image-mapping.json" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
