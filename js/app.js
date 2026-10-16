@@ -14,7 +14,8 @@
         selectedCountry: 'Brasil',
         cart: [],
         modalProduct: null,
-        carouselIndex: 0
+        carouselIndex: 0,
+        scrollPosition: 0
     };
 
     // ==========================================================================
@@ -98,7 +99,7 @@
     }
 
     // ==========================================================================
-    // NAVEGAÇÃO SCROLL (efecto de descolar na navbar)
+    // NAVEGAÇÃO SCROLL (efeito de descolar na navbar)
     // ==========================================================================
     const nav = document.querySelector('.apple-nav');
     const navTop = document.querySelector('.nav-top');
@@ -106,20 +107,45 @@
     const navLogo = document.querySelector('.nav-logo');
 
     let lastScrollY = window.scrollY;
+    let ticking = false;
 
     window.addEventListener('scroll', function() {
-        const currentScrollY = window.scrollY;
+        lastScrollY = window.scrollY;
         
-        if (currentScrollY > 50 && currentScrollY > lastScrollY) {
-            // Scroll para baixo - esconder navbar parcialmente
-            if (nav) nav.classList.add('scrolled');
-        } else if (currentScrollY < lastScrollY) {
-            // Scroll para cima - mostrar navbar completa
-            if (nav) nav.classList.remove('scrolled');
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                if (lastScrollY > 50 && lastScrollY > state.scrollPosition) {
+                    // Scroll para baixo - esconder navbar parcialmente
+                    if (nav) nav.classList.add('scrolled');
+                } else if (lastScrollY < state.scrollPosition) {
+                    // Scroll para cima - mostrar navbar completa
+                    if (nav) nav.classList.remove('scrolled');
+                }
+                state.scrollPosition = lastScrollY;
+                ticking = false;
+            });
+            ticking = true;
         }
-        
-        lastScrollY = currentScrollY;
     }, { passive: true });
+
+    // ==========================================================================
+    // PARALLAX EFECT NO HERO
+    // ==========================================================================
+    const heroImage = document.querySelector('.hero-image img');
+    const heroContent = document.querySelector('.hero-content');
+
+    if (heroImage) {
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset;
+            const heroHeight = window.innerHeight;
+            
+            if (scrollTop < heroHeight) {
+                const offset = scrollTop * 0.5;
+                heroImage.style.transform = 'translateY(' + offset + 'px)';
+                heroImage.style.opacity = 1 - (scrollTop / heroHeight * 0.3);
+            }
+        }, { passive: true });
+    }
 
     // ==========================================================================
     // BUSCA
@@ -151,7 +177,7 @@
             let msg = '🛒 ITENS NA SACOLA:\n\n';
             state.cart.forEach(function(item, index) {
                 total += item.preco;
-                msg += (index + 1) + '. ' + item.nome + ' - ' + item.preco + '\n';
+                msg += (index + 1) + '. ' + item.nome + ' - ' + item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) + '\n';
             });
             msg += '\nTOTAL: ' + total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             msg += '\n\n(Funcionalidade de checkout requer integração com pagamento da Apple)';
@@ -291,20 +317,21 @@
     const observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('visible');
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Aplicar animação aos cards de produto
+    // Aplicar animação aos cards de produto e seções
     document.querySelectorAll('.product-card').forEach(function(card, index) {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(3rem)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        card.classList.add('section-fade');
         card.style.animationDelay = (index * 0.1) + 's';
         observer.observe(card);
+    });
+
+    document.querySelectorAll('.section-fade').forEach(function(section) {
+        observer.observe(section);
     });
 
     // ==========================================================================
@@ -321,7 +348,7 @@
     });
 
     // ==========================================================================
-    // LINKS DE PRODUTO (abrir páginas locais)
+    // LINKS DE PRODUTO
     // ==========================================================================
     document.querySelectorAll('.product-buy, .section-links a').forEach(function(link) {
         link.addEventListener('click', function(e) {
@@ -356,6 +383,21 @@
     });
 
     // ==========================================================================
+    // EFEITO HOVER NOS CARDS DE PRODUTO
+    // ==========================================================================
+    document.querySelectorAll('.product-card').forEach(function(card) {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-0.5rem)';
+            this.style.boxShadow = '0 2rem 4rem rgba(0,0,0,0.1)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+
+    // ==========================================================================
     // INICIALIZAÇÃO
     // ==========================================================================
     document.addEventListener('DOMContentLoaded', function() {
@@ -368,6 +410,14 @@
             const flag = countryFlags[state.selectedCountry] || '🌐';
             countryBtn.innerHTML = flag + ' ' + state.selectedCountry;
         }
+        
+        // Inicializar animações de entrada
+        setTimeout(function() {
+            document.querySelectorAll('.hero-headline, .hero-subhead, .hero-links, .hero-image').forEach(function(el, i) {
+                el.style.animationDelay = (i * 0.2) + 's';
+                el.classList.add('animate-fade-in-up');
+            });
+        }, 100);
     });
 
 })();
